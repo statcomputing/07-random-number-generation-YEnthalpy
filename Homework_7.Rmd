@@ -1,0 +1,44 @@
+---
+title: "Homework &"
+author: "Zehan Yang"
+date: "10/23/2020"
+output: pdf_document
+header_includes:
+- \documentclass[12pt,hidelinks]{article}
+- \usepackage{configuration}
+output: 
+  pdf_document:
+    latex_engine: pdflatex
+---
+
+\section{Exercise 5.3.1}
+\subsection{Problem 1}
+\begin{proof}
+\begin{equation}
+\begin{aligned}
+\because 
+&\quad \intinf (2x ^ {\theta - 1}) + x ^ {\theta - 1/2})\exp(-x)dx\\
+&= 2\intinf x ^ {\theta - 1}\exp(-x)dx + \intinf x ^ {(\theta + 1/2) - 1}\exp(-x)dx\\
+&= 2\Gamma(\theta) + \Gamma(\theta + \frac{1}{2})\\
+\therefore
+C = \frac{1}{2\Gamma(\theta) + \Gamma(\theta + \frac{1}{2})}.
+\end{aligned}
+\end{equation}
+
+Suppose that 
+\begin{equation}
+g(x) = \omega_1g_1(x)+\omega_2g_2(x)
+= \omega_1\frac{x^{\theta - 1}}{\Gamma(\theta)}\exp(-x)+\omega_2\frac{x^{(\theta + 1/2) -1}}{\Gamma(\theta+1/2)}\exp(-x), 
+\end{equation}
+then we can get that
+\begin{equation}
+\begin{aligned}
+\omega_1 &= \frac{2\Gamma(\theta)}{2\Gamma(\theta) + \Gamma(\theta + \frac{1}{2})},\\
+\omega_2 &= \frac{\Gamma(\theta + \frac{1}{2})}{2\Gamma(\theta) + \Gamma(\theta + \frac{1}{2})},
+\end{aligned}
+\end{equation}
+where $\omega_1$ is the weight for Gamma distribution $g_1$ whose scale parameter $\beta = 1$ and shape parameter $\alpha = \theta$ and $g_2$ and $\omega_2$ is the weight for Gamma distribution $g_2$ whose scale parameter $\beta = 1$ and shape parameter $\alpha = \theta + 1/2$.
+\end{proof}
+
+\subsection{Problem 2}
+
