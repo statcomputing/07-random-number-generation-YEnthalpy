@@ -1,10 +1,8 @@
 ---
-title: "Homework &"
+title: "Homework 7"
 author: "Zehan Yang"
 date: "10/23/2020"
-output: pdf_document
-header_includes:
-- \documentclass[12pt,hidelinks]{article}
+header-includes:
 - \usepackage{configuration}
 output: 
   pdf_document:
@@ -14,31 +12,142 @@ output:
 \section{Exercise 5.3.1}
 \subsection{Problem 1}
 \begin{proof}
-\begin{equation}
+\begin{equation*}
 \begin{aligned}
 \because 
-&\quad \intinf (2x ^ {\theta - 1}) + x ^ {\theta - 1/2})\exp(-x)dx\\
+&\quad \intinf (2x ^ {\theta - 1} + x ^ {\theta - 1/2})\exp(-x)dx\\
 &= 2\intinf x ^ {\theta - 1}\exp(-x)dx + \intinf x ^ {(\theta + 1/2) - 1}\exp(-x)dx\\
 &= 2\Gamma(\theta) + \Gamma(\theta + \frac{1}{2})\\
 \therefore
-C = \frac{1}{2\Gamma(\theta) + \Gamma(\theta + \frac{1}{2})}.
+&\quad C = \frac{1}{2\Gamma(\theta) + \Gamma(\theta + \frac{1}{2})}.
 \end{aligned}
-\end{equation}
+\end{equation*}
 
 Suppose that 
-\begin{equation}
+\begin{equation*}
 g(x) = \omega_1g_1(x)+\omega_2g_2(x)
 = \omega_1\frac{x^{\theta - 1}}{\Gamma(\theta)}\exp(-x)+\omega_2\frac{x^{(\theta + 1/2) -1}}{\Gamma(\theta+1/2)}\exp(-x), 
-\end{equation}
+\end{equation*}
 then we can get that
-\begin{equation}
+\begin{equation*}
 \begin{aligned}
 \omega_1 &= \frac{2\Gamma(\theta)}{2\Gamma(\theta) + \Gamma(\theta + \frac{1}{2})},\\
 \omega_2 &= \frac{\Gamma(\theta + \frac{1}{2})}{2\Gamma(\theta) + \Gamma(\theta + \frac{1}{2})},
 \end{aligned}
-\end{equation}
-where $\omega_1$ is the weight for Gamma distribution $g_1$ whose scale parameter $\beta = 1$ and shape parameter $\alpha = \theta$ and $g_2$ and $\omega_2$ is the weight for Gamma distribution $g_2$ whose scale parameter $\beta = 1$ and shape parameter $\alpha = \theta + 1/2$.
+\end{equation*}
+where $\omega_1$ is the weight for the Gamma distribution $g_1$ whose scale parameter $\beta = 1$ and shape parameter $\alpha = \theta$ and $\omega_2$ is the weight for the Gamma distribution $g_2$ whose scale parameter $\beta = 1$ and shape parameter $\alpha = \theta + 1/2$.
 \end{proof}
-
 \subsection{Problem 2}
+I will choose $\theta = 2.5$, the plots for kernal density and true density are shown below.
+```{r}
+# Set up initiate values
+n <- 10000 
+theta <- 2.5
+# Function for generate one random sample from g(x) (Newton Method)
+r.mixgam <- function(theta, u, control = list(maxit = 1000, 
+                                              tol = 1e-5, init = 1)) {
+  shape <- c(theta, theta + 0.5)
+  weight <- c(2 * gamma(theta), gamma(theta + 0.5)) / 
+    (2 * gamma(theta) + gamma(theta + 0.5))
+  x <- control$init
+  for (i in 1 : control$maxit) {
+    upda <- (sum(weight * pgamma(x, shape)) - u) / 
+      sum(weight * dgamma(x, shape))
+    if (abs(upda) < control$tol) return(x)
+    x <- x - upda
+    if (i == control$maxit) warning("Max itiration reached")
+  }
+}
+# Generate sample from standard uniform distribution
+u <- runif(n) 
+# Generate sample from g(x)
+kernel <- rep(0, n) 
+for (i in 1 : n) {
+  kernel[i] <- r.mixgam(theta, u[i])
+}
+# Calculate the true density
+mix.gamma.x <- seq(min(kernel), max(kernel), 0.1)
+mix.gamma.y <- rep(0, length(mix.gamma.x))
+shape <- c(theta, theta + 0.5)
+weight <- c(2 * gamma(theta), gamma(theta + 0.5)) / 
+  (2 * gamma(theta) + gamma(theta + 0.5))
+for (i in 1 : length(mix.gamma.x)) {
+  mix.gamma.y[i] <- sum(weight * dgamma(mix.gamma.x[i], shape))
+}
+# Draw plot for the kernel density
+plot(density(kernel), main = "Desenty Plots", xlab = "X", 
+     ylab = "Density", col = "red", lty = 2, lwd = 2)
+lines(mix.gamma.y ~ mix.gamma.x, col = "blue", lty = 3, lwd = 2)
+# Draw plot for the true density
+legend("topright", legend = c("Kernal", "True"), col = c("red", "blue"),
+       lty = c(2, 3), lwd = c(2, 2))
+```
+
+\subsection{Problem 3}
+First, we state the following fact that
+\begin{equation}\label{eq1}
+ x^{\theta-1/2}\exp(-x) \le \sqrt{4+x}x^{\theta-1}\exp(-x) \le (2x^{\theta-1}+x^{\theta-1/2})\exp(-x).
+\end{equation}
+Next, Suppose $f(x) = C_1 \sqrt{4+x}x^{\theta-1}\exp(-x)$ and $h(x) = \frac{1}{\Gamma(\theta+1/2)}x^{\theta-1/2}\exp(-x)$ where $h(x)$ is the PDF for Gamma Distribution with shape parameter $\alpha = \theta+1/2$ and scale parameter $\beta = 1$. Then , based on \eqref{eq1}, we have $C_1<\frac{1}{\Gamma(\theta+1/2)}$ and
+\begin{equation*}
+\begin{aligned}
+f(x) &\le \frac{1}{\Gamma(\theta+1/2)}\sqrt{4+x}x^{\theta-1}\exp(-x) \\
+&\le M\cdot\frac{1}{\Gamma(\theta+1/2) + 2\Gamma(\theta)}(2x^{\theta-1}+x^{\theta-1/2})\exp(-x)\\
+&= M\cdot g(x),\\
+&where,~M=\frac{\Gamma(\theta+1/2) + 2\Gamma(\theta)}{\Gamma(\theta+1/2)}.
+\end{aligned}
+\end{equation*}
+Also, we have
+\begin{equation*}
+\begin{aligned}
+f(x) &\ge \frac{1}{\Gamma(\theta+1/2) + 2\Gamma(\theta)}\sqrt{4+x}x^{\theta-1}\exp(-x), \\
+\frac{f(x)}{M\cdot g(x)} &\ge \frac{\Gamma(\theta+1/2)}{\Gamma(\theta+1/2) + 2\Gamma(\theta)} \frac{\sqrt{4+x}}{2+x^{-1/2}}.
+\end{aligned}
+\end{equation*}
+The same as Problem 2, I choose $\theta = 2.5$.
+```{r}
+# Function for generate n random samples from f(x)
+r.mixgam.2 <- function(n, theta, control = list(maxit = 1000)){
+  x <- rep(0, n)
+  j <- 1
+  while(j < n) {
+    for (i in 1 : control$maxit) {
+    y <- r.mixgam(theta, runif(1))
+    u <- runif(1)
+    crit <- (gamma(theta + 0.5) * sqrt(4 + y)) / 
+      ((2 * gamma(theta) + gamma(theta + 0.5)) * (2 + y ^ (1/2)))
+      if (u <= crit){
+        x[j] = y
+        j <- j + 1
+        break
+      }
+      if (i == control$maxit){
+        j <- j
+      }
+    }
+  }
+  return(x)
+}
+# Calculate the true density
+fx <- function(x, ...){
+  sqrt(4 + x) * x ^ (theta - 1) * exp(-x)
+}
+c1 <- 1 / integrate(fx, 0, Inf)$value
+mix.gamma.x <- seq(min(kernel), max(kernel), 0.1)
+mix.gamma.y <- fx(mix.gamma.x) * c1
+# Draw plot for the kernel density
+kernel <- r.mixgam.2(1000, 2.5)
+plot(density(kernel), main = "Desenty Plots", xlab = "X", 
+     ylab = "Density", col = "red", lty = 2, lwd = 2)
+lines(mix.gamma.y ~ mix.gamma.x, col = "blue", lty = 3, lwd = 2)
+# Draw plot for the true density
+legend("topright", legend = c("Kernal", "True"), col = c("red", "blue"),
+       lty = c(2, 3), lwd = c(2, 2))
+```
+
+
+
+
+
+
 
