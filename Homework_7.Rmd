@@ -26,16 +26,22 @@ output:
 Suppose that 
 \begin{equation*}
 g(x) = \omega_1g_1(x)+\omega_2g_2(x)
-= \omega_1\frac{x^{\theta - 1}}{\Gamma(\theta)}\exp(-x)+\omega_2\frac{x^{(\theta + 1/2) -1}}{\Gamma(\theta+1/2)}\exp(-x), 
+= \omega_1\frac{x^{\theta - 1}}{\Gamma(\theta)}\exp(-x)+
+\omega_2\frac{x^{(\theta + 1/2) -1}}{\Gamma(\theta+1/2)}\exp(-x), 
 \end{equation*}
 then we can get that
 \begin{equation*}
 \begin{aligned}
-\omega_1 &= \frac{2\Gamma(\theta)}{2\Gamma(\theta) + \Gamma(\theta + \frac{1}{2})},\\
-\omega_2 &= \frac{\Gamma(\theta + \frac{1}{2})}{2\Gamma(\theta) + \Gamma(\theta + \frac{1}{2})},
+\omega_1 &= \frac{2\Gamma(\theta)}{2\Gamma(\theta) + 
+\Gamma(\theta + \frac{1}{2})},\\
+\omega_2 &= \frac{\Gamma(\theta + 
+\frac{1}{2})}{2\Gamma(\theta) + \Gamma(\theta + \frac{1}{2})},
 \end{aligned}
 \end{equation*}
-where $\omega_1$ is the weight for the Gamma distribution $g_1$ whose scale parameter $\beta = 1$ and shape parameter $\alpha = \theta$ and $\omega_2$ is the weight for the Gamma distribution $g_2$ whose scale parameter $\beta = 1$ and shape parameter $\alpha = \theta + 1/2$.
+where $\omega_1$ is the weight for the Gamma distribution $g_1$ whose
+scale parameter $\beta = 1$ and shape parameter $\alpha = \theta$ and
+$\omega_2$ is the weight for the Gamma distribution $g_2$ whose scale
+parameter $\beta = 1$ and shape parameter $\alpha = \theta + 1/2$.
 \end{proof}
 \subsection{Problem 2}
 I will choose $\theta = 2.5$, the plots for kernal density and true density are shown below.
@@ -88,10 +94,15 @@ First, we state the following fact that
 \begin{equation}\label{eq1}
  x^{\theta-1/2}\exp(-x) \le \sqrt{4+x}x^{\theta-1}\exp(-x) \le (2x^{\theta-1}+x^{\theta-1/2})\exp(-x).
 \end{equation}
-Next, Suppose $f(x) = C_1 \sqrt{4+x}x^{\theta-1}\exp(-x)$ and $h(x) = \frac{1}{\Gamma(\theta+1/2)}x^{\theta-1/2}\exp(-x)$ where $h(x)$ is the PDF for Gamma Distribution with shape parameter $\alpha = \theta+1/2$ and scale parameter $\beta = 1$. Then , based on \eqref{eq1}, we have $C_1<\frac{1}{\Gamma(\theta+1/2)}$ and
+Next, Suppose $f(x) = C_1 \sqrt{4+x}x^{\theta-1}\exp(-x)$ 
+and $h(x) = \frac{1}{\Gamma(\theta+1/2)}x^{\theta-1/2}\exp(-x)$ 
+where $h(x)$ is the PDF for Gamma Distribution with 
+shape parameter $\alpha = \theta+1/2$ and scale parameter $\beta = 1$.
+Then , based on \eqref{eq1}, we have $C_1<\frac{1}{\Gamma(\theta+1/2)}$ and
 \begin{equation*}
 \begin{aligned}
-f(x) &\le \frac{1}{\Gamma(\theta+1/2)}\sqrt{4+x}x^{\theta-1}\exp(-x) \\
+f(x) &\le \frac{1}{\Gamma(\theta+1/2)}
+\sqrt{4+x}x^{\theta-1}\exp(-x) \\
 &\le M\cdot\frac{1}{\Gamma(\theta+1/2) + 2\Gamma(\theta)}(2x^{\theta-1}+x^{\theta-1/2})\exp(-x)\\
 &= M\cdot g(x),\\
 &where,~M=\frac{\Gamma(\theta+1/2) + 2\Gamma(\theta)}{\Gamma(\theta+1/2)}.
@@ -145,14 +156,20 @@ legend("topright", legend = c("Kernal", "True"), col = c("red", "blue"),
        lty = c(2, 3), lwd = c(2, 2))
 ```
 \section{Exercise 6.3.1}
-Suppose $\{X_i\}_{i=1}^n$ follows the target Mixed Normal distributon. Based on the assumptions, the posterior density of $(\mu_1, \mu_2, \sigma_1^2, \sigma_2^2, \omega)$ should be
+Suppose $\{X_i\}_{i=1}^n$ follows the target Mixed Normal distribution.
+Based on the assumptions, the posterior density of $(\mu_1, \mu_2, \sigma_1^2, \sigma_2^2, \omega)$ should be
 \begin{equation}
 \begin{aligned}
 &\quad q(\mu_1, \mu_2, \sigma_1^2, \sigma_2^2, \omega|X_1,...,X_n) \\
-&= \prod_{i=1}^n f_1(X_i|\mu_1, \mu_2, \sigma_1^2, \sigma_2^2, \omega) \cdot f_2(\mu_1) \cdot f_2(\mu_2) \cdot f_3(\sigma_1^2) \cdot f_3(\sigma_2^2),
+&= \prod_{i=1}^n f_1(X_i|\mu_1, \mu_2, \sigma_1^2, \sigma_2^2, \omega)
+\cdot f_2(\mu_1) \cdot f_2(\mu_2) 
+\cdot f_3(\sigma_1^2) \cdot f_3(\sigma_2^2),
 \end{aligned}
 \end{equation}
-where $f_1(.)$ is the conditional distribution for the Mixed Normal distribution; $f_2(.)$ is the PDF for Normal distribution with $\mu = 0$ and $\sigma^2 = 100$ and $f_3(.)$ is the PDF for Inverse-Gamma distribution with shape parameter $\alpha = 0.5$ and scale parameter $\beta = 10$.
+where $f_1(.)$ is the conditional distribution for the Mixed Normal distribution; 
+$f_2(.)$ is the PDF for Normal distribution with $\mu = 0$ and $\sigma^2 = 100$ 
+and $f_3(.)$ is the PDF for Inverse-Gamma distribution with shape
+parameter $\alpha = 0.5$ and scale parameter $\beta = 10$.
 I will generate the data first.
 ```{r}
 n <- 1000
