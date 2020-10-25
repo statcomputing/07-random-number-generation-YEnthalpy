@@ -136,7 +136,7 @@ c1 <- 1 / integrate(fx, 0, Inf)$value
 mix.gamma.x <- seq(min(kernel), max(kernel), 0.1)
 mix.gamma.y <- fx(mix.gamma.x) * c1
 # Draw plot for the kernel density
-kernel <- r.mixgam.2(1000, 2.5)
+kernel <- r.mixgam.2(10000, 2.5)
 plot(density(kernel), main = "Desenty Plots", xlab = "X", 
      ylab = "Density", col = "red", lty = 2, lwd = 2)
 lines(mix.gamma.y ~ mix.gamma.x, col = "blue", lty = 3, lwd = 2)
@@ -144,7 +144,60 @@ lines(mix.gamma.y ~ mix.gamma.x, col = "blue", lty = 3, lwd = 2)
 legend("topright", legend = c("Kernal", "True"), col = c("red", "blue"),
        lty = c(2, 3), lwd = c(2, 2))
 ```
+\section{Exercise 6.3.1}
+Suppose $\{X_i\}_{i=1}^n$ follows the target Mixed Normal distributon. Based on the assumptions, the posterior density of $(\mu_1, \mu_2, \sigma_1^2, \sigma_2^2, \omega)$ should be
+\begin{equation}
+\begin{aligned}
+&\quad q(\mu_1, \mu_2, \sigma_1^2, \sigma_2^2, \omega|X_1,...,X_n) \\
+&= \prod_{i=1}^n f_1(X_i|\mu_1, \mu_2, \sigma_1^2, \sigma_2^2, \omega) \cdot f_2(\mu_1) \cdot f_2(\mu_2) \cdot f_3(\sigma_1^2) \cdot f_3(\sigma_2^2),
+\end{aligned}
+\end{equation}
+where $f_1(.)$ is the conditional distribution for the Mixed Normal distribution; $f_2(.)$ is the PDF for Normal distribution with $\mu = 0$ and $\sigma^2 = 100$ and $f_3(.)$ is the PDF for Inverse-Gamma distribution with shape parameter $\alpha = 0.5$ and scale parameter $\beta = 10$.
+I will generate the data first.
+```{r}
+n <- 1000
+mu <- c(7, 10)
+sigma <- c(1, 1)
+weight <- 0.5
+u <- rbinom(n, prob = weight, size = 1)
+x <- rnorm(n, ifelse(u == 1, mu[1], mu[2]), 
+           ifelse(u == 1, sigma[1], sigma[2]))
+```
 
+The log-posterior density should be easy to define.
+```{r}
+logpost <- function(theta, x) {
+  delta <- theta[1]
+  mu1 <- theta[2]; mu2 <- theta[3]
+  sigma2.1 <- theta[4]; sigma2.2 <- theta[5]
+  return(sum(log(delta * dnorm(x, mu1, sqrt(sigma2.1)) + (1 - delta) * dnorm(x, mu2, sqrt(sigma2.2))))
+         + log(dnorm(mu1, 0, 10)) + log(dnorm(mu2, 0, 10)) - 1.5 * log((sigma2.1 * sigma2.2)) 
+         - 10 * (sigma2.1 ^ (-1) + sigma2.2 ^ (-1)))
+}
+```
+Then, an MCMC based on Gibbs method using 'arms' algorithm in the package 'HI' is shown below.
+```{r}
+mymcmc <- function(niter, thetaInit, x, nburn = 100) {
+  p <- length(thetaInit)
+  theta.old <- thetaInit
+  logFC <- function(th, idx) {
+    theta <- theta.old
+    theta[idx] <- th
+    logpost(theta, x)
+  }
+  out <- matrix(thetaInit, niter, p, byrow = TRUE)
+  for (i in 2 : niter) {
+    for (j in 1 : p) {
+      out[i, j] <- theta.old[j] <- 
+        HI::arms(theta.old[j], logFC,
+                 function(x, idx) ((x > -100) * (x < 100)), 
+                 1, idx = j)
+    }
+  }
+  return(out[-(1 : nburn), ])
+}
+```
+Finally, plot the histograms for all parameters.
 
 
 
