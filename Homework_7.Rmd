@@ -50,27 +50,34 @@ I will choose $\theta = 2.5$, the plots for kernal density and true density are 
 n <- 10000 
 theta <- 2.5
 # Function for generate one random sample from g(x) (Newton Method)
-r.mixgam <- function(theta, u, control = list(maxit = 1000, 
+r.mixgam <- function(n, theta, control = list(maxit = 1000, 
                                               tol = 1e-5, init = 1)) {
   shape <- c(theta, theta + 0.5)
   weight <- c(2 * gamma(theta), gamma(theta + 0.5)) / 
     (2 * gamma(theta) + gamma(theta + 0.5))
-  x <- control$init
-  for (i in 1 : control$maxit) {
-    upda <- (sum(weight * pgamma(x, shape)) - u) / 
+  y <- rep(0, n); j <- 1
+  while(j <= n) {
+    x <- control$init
+    u <- runif(1)
+    for (i in 1 : control$maxit) {
+      upda <- (sum(weight * pgamma(x, shape)) - u) / 
       sum(weight * dgamma(x, shape))
-    if (abs(upda) < control$tol) return(x)
-    x <- x - upda
-    if (i == control$maxit) warning("Max itiration reached")
+      if (abs(upda) < control$tol) {
+        y[j] <- x
+        j <- j + 1
+        break
+      }
+      x <- x - upda
+      if (i == control$maxit){
+        j <- j
+      }
+    }
   }
+  return(y)
 }
 # Generate sample from standard uniform distribution
-u <- runif(n) 
 # Generate sample from g(x)
-kernel <- rep(0, n) 
-for (i in 1 : n) {
-  kernel[i] <- r.mixgam(theta, u[i])
-}
+kernel <- r.mixgam(n, 2.5)
 # Calculate the true density
 mix.gamma.x <- seq(min(kernel), max(kernel), 0.1)
 mix.gamma.y <- rep(0, length(mix.gamma.x))
@@ -121,9 +128,9 @@ The same as Problem 2, I choose $\theta = 2.5$.
 r.mixgam.2 <- function(n, theta, control = list(maxit = 1000)){
   x <- rep(0, n)
   j <- 1
-  while(j < n) {
+  while(j <= n) {
     for (i in 1 : control$maxit) {
-    y <- r.mixgam(theta, runif(1))
+    y <- r.mixgam(1, theta)
     u <- runif(1)
     crit <- (gamma(theta + 0.5) * sqrt(4 + y)) / 
       ((2 * gamma(theta) + gamma(theta + 0.5)) * (2 + y ^ (1/2)))
@@ -187,9 +194,10 @@ logpost <- function(theta, x) {
   delta <- theta[1]
   mu1 <- theta[2]; mu2 <- theta[3]
   sigma2.1 <- theta[4]; sigma2.2 <- theta[5]
-  return(sum(log(delta * dnorm(x, mu1, sqrt(sigma2.1)) + (1 - delta) * dnorm(x, mu2, sqrt(sigma2.2))))
-         + log(dnorm(mu1, 0, 10)) + log(dnorm(mu2, 0, 10)) - 1.5 * log((sigma2.1 * sigma2.2)) 
-         - 10 * (sigma2.1 ^ (-1) + sigma2.2 ^ (-1)))
+  y <- sum(log(delta * dnorm(x, mu1, sqrt(sigma2.1)) + (1 - delta) * dnorm(x, mu2, sqrt(sigma2.2))))
+         + log(dnorm(mu1, 0, 10)) + log(dnorm(mu2, 0, 10)) - 1.5 * log(sigma2.1 * sigma2.2) 
+         - 10 * (sigma2.1 ^ (-1) + sigma2.2 ^ (-1))
+  return(y)
 }
 ```
 Then, an MCMC based on Gibbs method using 'arms' algorithm in the package 'HI' is shown below.
